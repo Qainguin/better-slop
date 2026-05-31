@@ -39,7 +39,6 @@ function getOrCreatePool(): Pool {
 
 function makePrisma() {
 	const pool = getOrCreatePool();
-	//@ts-expect-error
 	const adapter = new PrismaPg(pool);
 	return new PrismaClient({ adapter });
 }
