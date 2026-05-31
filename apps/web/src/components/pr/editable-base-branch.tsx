@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useTransition, useEffect } from "react";
+import { useState, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { GitBranch, ChevronDown, Check, Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,6 +36,7 @@ export function EditableBaseBranch({
 	const [search, setSearch] = useState("");
 	const [isPending, startTransition] = useTransition();
 	const dropdownRef = useRef<HTMLDivElement>(null);
+	const triggerRef = useRef<HTMLButtonElement>(null);
 	const searchRef = useRef<HTMLInputElement>(null);
 
 	useClickOutside(dropdownRef, () => setOpen(false));
@@ -80,6 +81,7 @@ export function EditableBaseBranch({
 	return (
 		<div className="relative inline-flex" ref={dropdownRef}>
 			<button
+				ref={triggerRef}
 				onClick={handleOpen}
 				disabled={!canEdit}
 				className={cn(
@@ -97,9 +99,20 @@ export function EditableBaseBranch({
 					<ChevronDown className="w-2.5 h-2.5 text-muted-foreground" />
 				)}
 			</button>
-
 			{open && (
-				<div className="absolute top-full left-0 mt-1.5 z-50 w-56 bg-background border border-border rounded-lg shadow-lg overflow-hidden">
+				<div
+					className="fixed z-50 w-56 bg-background border border-border rounded-lg shadow-lg overflow-hidden"
+					style={{
+						top:
+							(triggerRef.current?.getBoundingClientRect()
+								.bottom ?? 0) + 6,
+						left: Math.min(
+							triggerRef.current?.getBoundingClientRect()
+								.left ?? 0,
+							window.innerWidth - 224 - 8,
+						),
+					}}
+				>
 					<div className="px-2 py-1.5 border-b border-border/60">
 						<div className="flex items-center gap-1.5">
 							<Search className="w-3 h-3 text-muted-foreground shrink-0" />

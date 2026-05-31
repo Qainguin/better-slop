@@ -33,7 +33,6 @@ import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 // !TODO: Last item in languages row should take up remaining space on mobile for a cleaner look
-// !TODO: Better input handling of contribution graph on mobile
 export interface UserProfile {
 	login: string;
 	name: string | null;
@@ -1257,7 +1256,7 @@ export function UserProfileContent({
 									</div>
 
 									{/* Desktop: Inline layout */}
-									<div className="contents">
+									<div className="hidden sm:contents">
 										<FolderGit2 className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
 										<div className="flex-1 min-w-0">
 											<div className="flex items-center gap-2 flex-wrap">

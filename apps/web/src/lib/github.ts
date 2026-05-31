@@ -98,6 +98,8 @@ type GitDataSyncJobType =
 // Any data from repos (issues, PRs, code, branches, etc.) is excluded because
 // private-repo data fetched by one authorized user would leak to others via
 // the shared cache, bypassing GitHub permission checks.
+// user_public_repos and org_repos are excluded: GitHub returns private repos when
+// the token matches the profile owner; see filterUserProfileReposForViewer.
 const SHAREABLE_CACHE_TYPES: ReadonlySet<string> = new Set([
 	"repo_branches",
 	"repo_tags",
@@ -116,11 +118,9 @@ const SHAREABLE_CACHE_TYPES: ReadonlySet<string> = new Set([
 	"repo_workflow_runs",
 	"repo_nav_counts",
 	"user_profile",
-	"user_public_repos",
 	"user_public_orgs",
 	"user_events",
 	"org",
-	"org_repos",
 	"org_members",
 	"trending_repos",
 ]);
@@ -1549,6 +1549,23 @@ async function enrichMissingRepoLanguagesFromGraphQL<
 }
 
 type UserPublicRepo = Awaited<ReturnType<Octokit["repos"]["listForUser"]>>["data"][number];
+
+/**
+ * User profile repo lists may include private repos when the GitHub token belongs to
+ * the profile subject. That payload must never be shown to other signed-in users
+ * (shared/per-user cache, or API quirks). Only the profile owner viewing their own
+ * profile keeps private entries.
+ */
+function filterUserProfileReposForViewer<T extends { private?: boolean }>(
+	repos: T[],
+	profileUsername: string,
+	viewerLogin: string | null | undefined,
+): T[] {
+	const subject = profileUsername.toLowerCase();
+	const viewer = viewerLogin?.toLowerCase() ?? null;
+	if (viewer === subject) return repos;
+	return repos.filter((r) => !r.private);
+}
 
 async function fetchUserPublicReposFromGitHub(
 	octokit: Octokit,
@@ -4077,9 +4094,15 @@ export async function getRepoIssues(
 
 // --- Combined issues page data via single GraphQL call ---
 
+export interface IssuesPageResult {
+	issues: RepoIssueNode[];
+	pageInfo: { hasNextPage: boolean; endCursor: string | null };
+	counts: { open: number; closed: number };
+}
+
 export interface RepoIssuesPageData {
 	openIssues: RepoIssueNode[];
-	closedIssues: RepoIssueNode[];
+	openPageInfo: { hasNextPage: boolean; endCursor: string | null };
 	openCount: number;
 	closedCount: number;
 }
@@ -4895,70 +4918,40 @@ export async function invalidateRepoDiscussionsCache(owner: string, repo: string
 	await deleteGithubCacheByPrefix(authCtx.userId, prefix);
 }
 
-const ISSUES_PAGE_GRAPHQL = `
-	query($owner: String!, $repo: String!) {
-		repository(owner: $owner, name: $repo) {
-			openIssues: issues(states: [OPEN], first: 50, orderBy: {field: CREATED_AT, direction: DESC}) {
-				totalCount
-				nodes {
-					databaseId
-					number
-					title
-					state
-					stateReason
-					updatedAt
-					createdAt
-					closedAt
-					author { login avatarUrl }
-					labels(first: 20) { nodes { name color } }
-					assignees(first: 10) { nodes { login avatarUrl } }
-					milestone { title }
-					comments { totalCount }
-					reactions { totalCount }
-					thumbsUp: reactions(content: THUMBS_UP) { totalCount }
-					timelineItems(first: 10, itemTypes: [CROSS_REFERENCED_EVENT]) {
-						nodes {
-							... on CrossReferencedEvent {
-								source {
-									... on PullRequest { number url }
-								}
-							}
-						}
-					}
-				}
-			}
-			closedIssues: issues(states: [CLOSED], first: 50, orderBy: {field: CREATED_AT, direction: DESC}) {
-				totalCount
-				nodes {
-					databaseId
-					number
-					title
-					state
-					stateReason
-					updatedAt
-					createdAt
-					closedAt
-					author { login avatarUrl }
-					labels(first: 20) { nodes { name color } }
-					assignees(first: 10) { nodes { login avatarUrl } }
-					milestone { title }
-					comments { totalCount }
-					reactions { totalCount }
-					thumbsUp: reactions(content: THUMBS_UP) { totalCount }
-					timelineItems(first: 10, itemTypes: [CROSS_REFERENCED_EVENT]) {
-						nodes {
-							... on CrossReferencedEvent {
-								source {
-									... on PullRequest { number url }
-								}
-							}
-						}
-					}
+const ISSUE_NODE_FRAGMENT = `
+	databaseId
+	number
+	title
+	state
+	stateReason
+	updatedAt
+	createdAt
+	closedAt
+	author { login avatarUrl }
+	labels(first: 20) { nodes { name color } }
+	assignees(first: 10) { nodes { login avatarUrl } }
+	milestone { title }
+	comments { totalCount }
+	reactions { totalCount }
+	thumbsUp: reactions(content: THUMBS_UP) { totalCount }
+	timelineItems(first: 10, itemTypes: [CROSS_REFERENCED_EVENT]) {
+		nodes {
+			... on CrossReferencedEvent {
+				source {
+					... on PullRequest { number url }
 				}
 			}
 		}
 	}
 `;
+
+const EMPTY_ISSUES_COUNTS = { open: 0, closed: 0 };
+
+const EMPTY_ISSUES_PAGE_RESULT: IssuesPageResult = {
+	issues: [],
+	pageInfo: { hasNextPage: false, endCursor: null },
+	counts: EMPTY_ISSUES_COUNTS,
+};
 
 // ── GraphQL Issue node types ──
 
@@ -5024,38 +5017,78 @@ function mapGraphQLIssueNode(node: GQLIssueNode): RepoIssueNode {
 	};
 }
 
-async function fetchRepoIssuesPageGraphQL(
-	token: string,
+export async function getRepoIssuesWithStats(
 	owner: string,
 	repo: string,
-): Promise<RepoIssuesPageData> {
-	const response = await fetch("https://api.github.com/graphql", {
-		method: "POST",
-		headers: {
-			Authorization: `Bearer ${token}`,
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			query: ISSUES_PAGE_GRAPHQL,
-			variables: { owner, repo },
-		}),
-	});
+	state: "open" | "closed" = "open",
+	opts?: {
+		includeCounts?: boolean;
+		perPage?: number;
+		cursor?: string | null;
+	},
+): Promise<IssuesPageResult> {
+	const token = await getGitHubToken();
+	if (!token) return EMPTY_ISSUES_PAGE_RESULT;
 
-	if (!response.ok) {
-		throw new Error(`GraphQL request failed: ${response.status}`);
-	}
-	const json = await response.json();
-	const r = json.data?.repository;
-	if (!r) {
-		return { openIssues: [], closedIssues: [], openCount: 0, closedCount: 0 };
-	}
+	const statesArg = state === "closed" ? "[CLOSED]" : "[OPEN]";
+	const limit = opts?.perPage ?? 30;
+	const wantCounts = !!opts?.includeCounts;
 
-	return {
-		openIssues: (r.openIssues?.nodes ?? []).map(mapGraphQLIssueNode),
-		closedIssues: (r.closedIssues?.nodes ?? []).map(mapGraphQLIssueNode),
-		openCount: r.openIssues?.totalCount ?? 0,
-		closedCount: r.closedIssues?.totalCount ?? 0,
-	};
+	const countFields = wantCounts
+		? `
+			openCount: issues(states: [OPEN]) { totalCount }
+			closedCount: issues(states: [CLOSED]) { totalCount }
+		`
+		: "";
+
+	const afterArg = opts?.cursor ? `, after: "${opts.cursor}"` : "";
+
+	const query = `query($owner: String!, $name: String!) {
+		repository(owner: $owner, name: $name) {
+			${countFields}
+			issues(first: ${limit}, states: ${statesArg}, orderBy: { field: CREATED_AT, direction: DESC }${afterArg}) {
+				pageInfo { hasNextPage endCursor }
+				nodes { ${ISSUE_NODE_FRAGMENT} }
+			}
+		}
+	}`;
+
+	try {
+		const response = await fetch("https://api.github.com/graphql", {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${token}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ query, variables: { owner, name: repo } }),
+		});
+
+		if (!response.ok) return EMPTY_ISSUES_PAGE_RESULT;
+		const json = await response.json();
+		const repo_data = json.data?.repository;
+		const issueConnection = repo_data?.issues;
+		const nodes = issueConnection?.nodes;
+		if (!nodes) return EMPTY_ISSUES_PAGE_RESULT;
+
+		const counts = wantCounts
+			? {
+					open: repo_data.openCount?.totalCount ?? 0,
+					closed: repo_data.closedCount?.totalCount ?? 0,
+				}
+			: EMPTY_ISSUES_COUNTS;
+
+		const pageInfo = {
+			hasNextPage: issueConnection.pageInfo?.hasNextPage ?? false,
+			endCursor: issueConnection.pageInfo?.endCursor ?? null,
+		};
+
+		const issues = (nodes as GQLIssueNode[]).map(mapGraphQLIssueNode);
+
+		return { issues, pageInfo, counts };
+	} catch (error) {
+		rethrowKnownGitHubErrors(error);
+		return EMPTY_ISSUES_PAGE_RESULT;
+	}
 }
 
 function buildRepoIssuesPageCacheKey(owner: string, repo: string): string {
@@ -5066,7 +5099,7 @@ export async function getRepoIssuesPage(owner: string, repo: string): Promise<Re
 	const authCtx = await getGitHubAuthContext();
 	const fallback: RepoIssuesPageData = {
 		openIssues: [],
-		closedIssues: [],
+		openPageInfo: { hasNextPage: false, endCursor: null },
 		openCount: 0,
 		closedCount: 0,
 	};
@@ -5079,7 +5112,16 @@ export async function getRepoIssuesPage(owner: string, repo: string): Promise<Re
 		jobPayload: { owner, repo, state: "all" },
 		fetchRemote: async () => {
 			if (!authCtx) return fallback;
-			return fetchRepoIssuesPageGraphQL(authCtx.token, owner, repo);
+			const result = await getRepoIssuesWithStats(owner, repo, "open", {
+				includeCounts: true,
+				perPage: 30,
+			});
+			return {
+				openIssues: result.issues,
+				openPageInfo: result.pageInfo,
+				openCount: result.counts.open,
+				closedCount: result.counts.closed,
+			};
 		},
 	});
 
@@ -5090,7 +5132,11 @@ export async function getRepoIssuesPage(owner: string, repo: string): Promise<Re
 		}).catch(() => {});
 	}
 
-	return data;
+	// Old cached entries may lack pagination fields
+	return {
+		...data,
+		openPageInfo: data.openPageInfo ?? { hasNextPage: false, endCursor: null },
+	};
 }
 
 export async function invalidateRepoPullRequestsCache(owner: string, repo: string) {
@@ -5161,8 +5207,9 @@ export async function invalidateFileContentCache(
 export async function invalidateRepoIssuesCache(owner: string, repo: string) {
 	const authCtx = await getGitHubAuthContext();
 	if (!authCtx) return;
-	const prefix = `repo_issues:${normalizeRepoKey(owner, repo)}`;
-	await deleteGithubCacheByPrefix(authCtx.userId, prefix);
+	const key = normalizeRepoKey(owner, repo);
+	await deleteGithubCacheByPrefix(authCtx.userId, `repo_issues:${key}`);
+	await deleteGithubCacheByPrefix(authCtx.userId, `repo_issues_page:${key}`);
 	// Also invalidate nav counts so issue count updates immediately
 	const navCountsKey = buildRepoNavCountsCacheKey(owner, repo);
 	await deleteGithubCacheByPrefix(authCtx.userId, navCountsKey);
@@ -5176,6 +5223,7 @@ export async function invalidateIssueCache(owner: string, repo: string, issueNum
 	await deleteGithubCacheByPrefix(authCtx.userId, `issue:${key}:${issueNumber}`);
 	await deleteGithubCacheByPrefix(authCtx.userId, `issue_comments:${key}:${issueNumber}`);
 	await deleteGithubCacheByPrefix(authCtx.userId, `repo_issues:${key}`);
+	await deleteGithubCacheByPrefix(authCtx.userId, `repo_issues_page:${key}`);
 	// Also invalidate shared cache so other users see fresh data
 	await deleteSharedCacheByPrefix(`issue:${key}:${issueNumber}`);
 	await deleteSharedCacheByPrefix(`issue_comments:${key}:${issueNumber}`);
@@ -6436,9 +6484,14 @@ export async function getUser(username: string) {
 	});
 }
 
+/**
+ * Fetches repos for a GitHub user handle and strips private entries unless the
+ * signed-in viewer is that user. Use {@link getUserProfileRepositories} from
+ * profile routes so listings never bypass this logic.
+ */
 export async function getUserPublicRepos(username: string, perPage = 30) {
 	const authCtx = await getGitHubAuthContext();
-	return readLocalFirstGitData({
+	const repos = await readLocalFirstGitData({
 		authCtx,
 		cacheKey: buildUserPublicReposCacheKey(username, perPage),
 		cacheType: "user_public_repos",
@@ -6453,6 +6506,16 @@ export async function getUserPublicRepos(username: string, perPage = 30) {
 				authCtx?.token ?? null,
 			),
 	});
+	return filterUserProfileReposForViewer(repos, username, authCtx?.githubUser?.login);
+}
+
+/**
+ * Canonical entry for user profile pages (`/users/:login`, `/:login` when the
+ * actor is a user). Do not replace with `octokit.repos.listForUser` or
+ * `/api/user-repos` — those can leak private repo names across viewers.
+ */
+export async function getUserProfileRepositories(login: string, perPage = 100) {
+	return getUserPublicRepos(login, perPage);
 }
 
 export async function getUserPublicOrgs(username: string) {

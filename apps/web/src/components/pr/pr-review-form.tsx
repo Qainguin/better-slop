@@ -59,6 +59,7 @@ export function PRReviewForm({ owner, repo, pullNumber, participants }: PRReview
 	const [isPending, startTransition] = useTransition();
 	const [error, setError] = useState<string | null>(null);
 	const panelRef = useRef<HTMLDivElement>(null);
+	const triggerRef = useRef<HTMLButtonElement>(null);
 
 	useClickOutside(
 		panelRef,
@@ -91,6 +92,7 @@ export function PRReviewForm({ owner, repo, pullNumber, participants }: PRReview
 	return (
 		<div ref={panelRef} className="relative">
 			<button
+				ref={triggerRef}
 				onClick={() => setOpen((o) => !o)}
 				className={cn(
 					"flex items-center gap-1.5 px-3 py-1.5 text-xs",
@@ -111,7 +113,19 @@ export function PRReviewForm({ owner, repo, pullNumber, participants }: PRReview
 			</button>
 
 			{open && (
-				<div className="absolute top-full right-0 mt-1.5 w-96 z-50 border border-border bg-background shadow-lg dark:shadow-2xl">
+				<div
+					className="fixed sm:w-96 z-50 border border-border bg-background shadow-lg dark:shadow-2xl"
+					style={{
+						top:
+							(triggerRef.current?.getBoundingClientRect()
+								.bottom ?? 0) + 6,
+						left: Math.max(
+							8,
+							(triggerRef.current?.getBoundingClientRect()
+								.right ?? 0) - 384,
+						),
+					}}
+				>
 					{/* Toolbar + Textarea */}
 					<div className="p-3 pb-2">
 						<MarkdownEditor
