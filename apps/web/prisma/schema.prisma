@@ -24,6 +24,7 @@ model User {
   usageLogs    UsageLog[]
   aiCallLogs   AiCallLog[]
   creditLedger CreditLedger[]
+  issueTriageOverlays IssueTriageOverlay[]
 
   aiMessageCount Int       @default(0)
   lastActiveAt   DateTime?
@@ -260,6 +261,35 @@ model PinnedItem {
   @@unique([userId, owner, repo, url])
   @@index([userId, owner, repo])
   @@map("pinned_items")
+}
+
+model IssueTriageOverlay {
+  id                String  @id
+  userId            String
+  owner             String
+  repo              String
+  issueNumber       Int
+  issueId           BigInt?
+  issueTitle        String
+  issueUrl          String?
+  labelsJson        String  @default("[]")
+  difficulty        String?
+  v2Fit             String?
+  categoryPathsJson String  @default("[]")
+  notes             String?
+  status            String  @default("untriaged")
+  triagedAt         String?
+  skippedAt         String?
+  createdAt         String
+  updatedAt         String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, owner, repo, issueNumber])
+  @@index([userId, owner, repo, status])
+  @@index([userId, difficulty])
+  @@index([userId, v2Fit])
+  @@map("issue_triage_overlays")
 }
 
 model UsageLog {

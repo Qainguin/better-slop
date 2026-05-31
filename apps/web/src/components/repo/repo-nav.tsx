@@ -119,6 +119,12 @@ export function RepoNav({
 			active: pathname.startsWith(`${base}/issues`),
 			count: (openIssuesCount ?? 0) + countAdjustments.issues,
 		},
+		{
+			label: "Triage",
+			href: `${base}/triage`,
+			active: pathname.startsWith(`${base}/triage`),
+			count: (openIssuesCount ?? 0) + countAdjustments.issues,
+		},
 		...(hasDiscussions
 			? [
 					{
