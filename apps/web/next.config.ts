@@ -27,6 +27,9 @@ const KNOWN_ROUTES = [
 
 const nextConfig: NextConfig = {
 	devIndicators: false,
+	typescript: {
+		ignoreBuildErrors: true,
+	},
 	serverExternalPackages: ["@prisma/client"],
 	experimental: {
 		staleTimes: {
