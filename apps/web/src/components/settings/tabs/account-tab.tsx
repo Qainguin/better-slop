@@ -29,7 +29,6 @@ interface AccountTabProps {
 	onUpdate: (updates: Partial<UserSettings>) => Promise<void>;
 	githubProfile: GitHubProfile;
 }
-
 function formatCount(n: number): string {
 	if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}m`;
 	if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
@@ -240,7 +239,7 @@ export function AccountTab({ user, settings, onUpdate, githubProfile }: AccountT
 					GitHub Permissions
 				</label>
 				<p className="mt-1 text-[10px] text-muted-foreground/50 font-mono">
-					Manage which GitHub permissions are granted to Better Hub.
+					Manage which GitHub permissions are granted to Better Slop.
 					Toggle scopes and click update to re-authorize.
 				</p>
 

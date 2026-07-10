@@ -30,7 +30,6 @@ export function stateColor(state: string): string {
 			return OG.muted;
 	}
 }
-
 // ── Font loading (cached at module level) ──
 
 let _geistSans: ArrayBuffer | null = null;
@@ -96,7 +95,7 @@ export function BrandWatermark() {
 				letterSpacing: "0.05em",
 			}}
 		>
-			BETTER-HUB.
+			BETTER-SLOP.
 		</div>
 	);
 }
@@ -164,6 +163,6 @@ export function ogImageUrl(params: Record<string, string | number>): string {
 
 export function ogImages(url: string) {
 	return {
-		images: [{ url, width: OG.width, height: OG.height, alt: "Better Hub" }],
+		images: [{ url, width: OG.width, height: OG.height, alt: "Better Slop" }],
 	};
 }

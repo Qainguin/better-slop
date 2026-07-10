@@ -1,13 +1,13 @@
 services:
         postgres:
                 image: postgres:16-alpine
-                container_name: better-hub-postgres
+                container_name: better-slop-postgres
                 restart: unless-stopped
                 command: postgres -c max_connections=300
                 environment:
                         POSTGRES_USER: postgres
                         POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-                        POSTGRES_DB: better_hub
+                        POSTGRES_DB: better_slop
                 ports:
                         - "127.0.0.1:54320:5432"
                 volumes:
@@ -15,14 +15,14 @@ services:
 
         redis:
                 image: redis:7-alpine
-                container_name: better-hub-redis
+                container_name: better-slop-redis
                 restart: unless-stopped
                 volumes:
                         - redis_data:/data
 
         redis-rest:
                 image: hiett/serverless-redis-http:latest
-                container_name: better-hub-redis-rest
+                container_name: better-slop-redis-rest
                 restart: unless-stopped
                 ports:
                         - "127.0.0.1:8079:80"

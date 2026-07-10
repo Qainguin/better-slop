@@ -36,7 +36,6 @@ interface IssueCommentFormProps {
 	userName?: string;
 	participants?: Array<{ login: string; avatar_url: string }>;
 }
-
 export function IssueCommentForm({
 	owner,
 	repo,
@@ -50,7 +49,7 @@ export function IssueCommentForm({
 }: IssueCommentFormProps) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
-	const draftKey = `better-hub:draft:comment:${owner}/${repo}/${issueNumber}`;
+	const draftKey = `better-slop:draft:comment:${owner}/${repo}/${issueNumber}`;
 
 	// Restore draft on mount
 	const [body, setBody] = useState(() => {

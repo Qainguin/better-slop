@@ -23,7 +23,6 @@ export interface OnboardingOverlayProps {
 	initialStarredAuth?: boolean;
 	initialStarredHub?: boolean;
 }
-
 const GHOST_WELCOME_USER = "Hey Ghost! I just got here. What can you help me with?";
 
 function getGhostWelcomeResponse() {
@@ -31,7 +30,7 @@ function getGhostWelcomeResponse() {
 	const modI = formatForDisplay("Mod+I");
 	const modSlash = formatForDisplay("Mod+/");
 
-	return `Hey! Welcome to Better Hub. I'm Ghost, your AI assistant. Here's what I can help with:
+	return `Hey! Welcome to Better Slop. I'm Ghost, your AI assistant. Here's what I can help with:
 
 - **Review PRs and code** — I can summarize changes, spot issues, and help you understand diffs
 - **Navigate repos** — ask me about any file, function, or piece of code
@@ -115,7 +114,7 @@ export function OnboardingOverlay({
 	const handleStarHub = useCallback(() => {
 		setStarredHub(true);
 		startTransition(async () => {
-			await starRepo("better-auth", "better-hub");
+			await starRepo("better-auth", "better-slop");
 		});
 	}, []);
 
@@ -233,7 +232,7 @@ export function OnboardingOverlay({
 						</p>
 
 						<p className="text-[13px] sm:text-[14px] text-white/50 leading-[1.8] sm:leading-[1.85] mt-4 ob-fade-up-d1">
-							Welcome to Better Hub. At {""}
+							Welcome to Better Slop. At {""}
 							<a
 								href="https://better-auth.com"
 								target="_blank"
@@ -316,7 +315,7 @@ export function OnboardingOverlay({
 								/>
 								{starredHub
 									? "Starred!"
-									: "better-hub"}
+									: "better-slop"}
 							</button>
 						</div>
 

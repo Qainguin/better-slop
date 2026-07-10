@@ -22,7 +22,6 @@ interface RepoEntry {
 	fullName: string;
 	description: string | null;
 }
-
 type Step = "input" | "scanning" | "preview" | "error";
 
 export function PublishForm() {
@@ -103,7 +102,7 @@ export function PublishForm() {
 					Select one of your public GitHub repositories that contains
 					a{" "}
 					<code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-						better-hub-extension.json
+						better-slop-extension.json
 					</code>{" "}
 					manifest file.
 				</p>

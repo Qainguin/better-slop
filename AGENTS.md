@@ -1,8 +1,8 @@
-# Better Hub AGENTS.md
+# Better Slop AGENTS.md
 
 ## Production Information
 
-- The origin for better-hub is: https://better-hub.com
+- The origin for better-slop is: https://better-slop.vercel.app
   in
 
 ## Design

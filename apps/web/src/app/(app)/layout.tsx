@@ -47,7 +47,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 		try {
 			[initialStarredAuth, initialStarredHub] = await Promise.all([
 				checkIsStarred("better-auth", "better-auth"),
-				checkIsStarred("better-auth", "better-hub"),
+				checkIsStarred("better-auth", "better-slop"),
 			]);
 		} catch {
 			// Same — don't let secondary API failures crash the shell.

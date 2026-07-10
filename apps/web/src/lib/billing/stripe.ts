@@ -7,7 +7,6 @@ export const isStripeEnabled = !!process.env.STRIPE_SECRET_KEY;
 if (!isStripeEnabled) {
 	console.warn("[billing] STRIPE_SECRET_KEY is not set — Stripe features are disabled.");
 }
-
 let _stripe: Stripe | null = null;
 export function getStripeClient(): Stripe {
 	if (!_stripe) {
@@ -42,7 +41,7 @@ export async function reportUsageToStripe(
 	if (!user?.stripeCustomerId) return;
 
 	await getStripeClient().billing.meterEvents.create({
-		event_name: "better_hub_usage",
+		event_name: "better_slop_usage",
 		payload: {
 			stripe_customer_id: user.stripeCustomerId,
 			value: String(units),

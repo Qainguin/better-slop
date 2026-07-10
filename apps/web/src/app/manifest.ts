@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
 	return {
-		name: "Better Hub",
-		short_name: "Better Hub",
+		name: "Better Slop",
+		short_name: "Better Slop",
 		description: "Re-imagining code collaboration for humans and agents.",
 		start_url: "/",
 		display: "standalone",

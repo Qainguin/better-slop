@@ -49,7 +49,6 @@ interface AppNavbarProps {
 	session: $Session;
 	notifications: NotificationItem[];
 }
-
 export function AppNavbar({ session, notifications }: AppNavbarProps) {
 	const { mode, toggleMode } = useColorTheme();
 	const { subscribe } = useMutationEvents();
@@ -114,7 +113,7 @@ export function AppNavbar({ session, notifications }: AppNavbarProps) {
 						</svg>
 
 						<span className="text-sm tracking-tight text-foreground">
-							BETTER-HUB.
+							BETTER-SLOP.
 						</span>
 					</Link>
 				</div>

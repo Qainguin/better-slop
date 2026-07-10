@@ -1,4 +1,4 @@
-const DEFAULT_HOST = "https://better-hub.com";
+const DEFAULT_HOST = "https://better-slop.vercel.app";
 
 browser.runtime.onInstalled.addListener(() => {
 	browser.storage.local.get(["enabled", "host"]).then((data) => {
@@ -77,7 +77,6 @@ async function switchToDynamicRules(host) {
 		addRules: buildRules(host),
 	});
 }
-
 async function clearDynamicRules() {
 	const existing = await browser.declarativeNetRequest.getDynamicRules();
 	await browser.declarativeNetRequest.updateDynamicRules({

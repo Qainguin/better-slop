@@ -1,4 +1,4 @@
-const DEFAULT_HOST = "https://better-hub.com";
+const DEFAULT_HOST = "https://better-slop.vercel.app";
 
 // Track tabs on the logout page so we can avoid redirecting github.com/
 // after logout (declarativeNetRequest cancels the request mid-flight
@@ -111,7 +111,6 @@ function switchToDynamicRules(host) {
 		});
 	});
 }
-
 function clearDynamicRules() {
 	chrome.declarativeNetRequest.getDynamicRules((existing) => {
 		chrome.declarativeNetRequest.updateDynamicRules({

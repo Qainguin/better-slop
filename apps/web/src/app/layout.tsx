@@ -26,7 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
 	subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://better-hub.com";
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://better-slop.vercel.app";
 
 export const viewport: Viewport = {
 	themeColor: "#000000",
@@ -34,29 +34,29 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
 	title: {
-		default: "Better Hub",
-		template: "%s | Better Hub",
+		default: "Better Slop",
+		template: "%s | Better Slop",
 	},
 	description: "Re-imagining code collaboration for humans and agents.",
 	metadataBase: new URL(siteUrl),
 	openGraph: {
-		title: "Better Hub",
+		title: "Better Slop",
 		description: "Re-imagining code collaboration for humans and agents.",
-		siteName: "Better Hub",
+		siteName: "Better Slop",
 		url: siteUrl,
 		images: [
 			{
 				url: "/og.png",
 				width: 1200,
 				height: 630,
-				alt: "Better Hub",
+				alt: "Better Slop",
 			},
 		],
 		type: "website",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Better Hub",
+		title: "Better Slop",
 		description: "Re-imagining code collaboration for humans and agents.",
 		images: ["/og.png"],
 	},
@@ -84,7 +84,6 @@ function getMpThemeSSRStyle(cookieStore: Awaited<ReturnType<typeof cookies>>): s
 		return "";
 	}
 }
-
 export default async function RootLayout({
 	children,
 }: Readonly<{

@@ -51,12 +51,11 @@ interface RepoLabel {
 	color: string;
 	description: string | null;
 }
-
 // Cache templates & labels per repo so reopening is instant
 const cache = new Map<string, { templates: IssueTemplate[]; labels: RepoLabel[] }>();
 const uploadContextCache = new Map<string, IssueImageUploadContext>();
 
-const DRAFT_PREFIX = "better-hub:draft:issue:";
+const DRAFT_PREFIX = "better-slop:draft:issue:";
 
 export function CreateIssueDialog({ owner, repo }: { owner: string; repo: string }) {
 	const router = useRouter();
@@ -420,7 +419,7 @@ export function CreateIssueDialog({ owner, repo }: { owner: string; repo: string
 			setError(
 				uploadMode === "name_taken"
 					? "Fork name is already taken by another repository."
-					: "Upload images with Better Hub by forking this repository or entering an image URL.",
+					: "Upload images with Better Slop by forking this repository or entering an image URL.",
 			);
 			startForkChoice();
 			return;

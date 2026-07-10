@@ -34,7 +34,7 @@ export async function generateMetadata({
 		const orgData = await getOrg(owner).catch(() => null);
 		const title = orgData?.name || orgData?.login || userData.name || userData.login;
 		const description =
-			orgData?.description || userData.bio || `${title} on Better Hub`;
+			orgData?.description || userData.bio || `${title} on Better Slop`;
 		return {
 			title,
 			description,
@@ -46,12 +46,11 @@ export async function generateMetadata({
 	const displayName = userData.name ? `${userData.name} (${userData.login})` : userData.login;
 	return {
 		title: displayName,
-		description: userData.bio || `${displayName} on Better Hub`,
+		description: userData.bio || `${displayName} on Better Slop`,
 		openGraph: { title: displayName, ...ogImages(ogUrl) },
 		twitter: { card: "summary_large_image", ...ogImages(ogUrl) },
 	};
 }
-
 export default async function OwnerPage({ params }: { params: Promise<{ owner: string }> }) {
 	const { owner } = await params;
 

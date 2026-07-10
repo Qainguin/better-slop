@@ -5,7 +5,7 @@
 		"action": {
 			"type": "redirect",
 			"redirect": {
-				"regexSubstitution": "https://better-hub.com/\\1/\\2/pull/\\3"
+				"regexSubstitution": "https://better-slop.vercel.app/\\1/\\2/pull/\\3"
 			}
 		},
 		"condition": {
@@ -19,7 +19,7 @@
 		"action": {
 			"type": "redirect",
 			"redirect": {
-				"regexSubstitution": "https://better-hub.com/\\1/\\2/commit/\\3"
+				"regexSubstitution": "https://better-slop.vercel.app/\\1/\\2/commit/\\3"
 			}
 		},
 		"condition": {
@@ -33,7 +33,7 @@
 		"action": {
 			"type": "redirect",
 			"redirect": {
-				"regexSubstitution": "https://better-hub.com/\\1/\\2/actions/\\3"
+				"regexSubstitution": "https://better-slop.vercel.app/\\1/\\2/actions/\\3"
 			}
 		},
 		"condition": {
@@ -47,7 +47,7 @@
 		"action": {
 			"type": "redirect",
 			"redirect": {
-				"regexSubstitution": "https://better-hub.com/\\1/\\2"
+				"regexSubstitution": "https://better-slop.vercel.app/\\1/\\2"
 			}
 		},
 		"condition": {
@@ -61,7 +61,7 @@
 		"action": {
 			"type": "redirect",
 			"redirect": {
-				"regexSubstitution": "https://better-hub.com/\\1/\\2/\\3"
+				"regexSubstitution": "https://better-slop.vercel.app/\\1/\\2/\\3"
 			}
 		},
 		"condition": {
@@ -75,7 +75,7 @@
 		"action": {
 			"type": "redirect",
 			"redirect": {
-				"regexSubstitution": "https://better-hub.com/\\1/\\2\\3"
+				"regexSubstitution": "https://better-slop.vercel.app/\\1/\\2\\3"
 			}
 		},
 		"condition": {
@@ -248,7 +248,7 @@
 		"action": {
 			"type": "redirect",
 			"redirect": {
-				"regexSubstitution": "https://better-hub.com/notifications"
+				"regexSubstitution": "https://better-slop.vercel.app/notifications"
 			}
 		},
 		"condition": {
@@ -261,7 +261,9 @@
 		"priority": 4,
 		"action": {
 			"type": "redirect",
-			"redirect": { "regexSubstitution": "https://better-hub.com/trending" }
+			"redirect": {
+				"regexSubstitution": "https://better-slop.vercel.app/trending"
+			}
 		},
 		"condition": {
 			"regexFilter": "^https://github\\.com/trending",
@@ -273,7 +275,7 @@
 		"priority": 4,
 		"action": {
 			"type": "redirect",
-			"redirect": { "regexSubstitution": "https://better-hub.com/issues" }
+			"redirect": { "regexSubstitution": "https://better-slop.vercel.app/issues" }
 		},
 		"condition": {
 			"regexFilter": "^https://github\\.com/issues$",
@@ -285,7 +287,7 @@
 		"priority": 4,
 		"action": {
 			"type": "redirect",
-			"redirect": { "regexSubstitution": "https://better-hub.com/prs" }
+			"redirect": { "regexSubstitution": "https://better-slop.vercel.app/prs" }
 		},
 		"condition": {
 			"regexFilter": "^https://github\\.com/pulls$",
@@ -297,7 +299,7 @@
 		"priority": 4,
 		"action": {
 			"type": "redirect",
-			"redirect": { "regexSubstitution": "https://better-hub.com/stars" }
+			"redirect": { "regexSubstitution": "https://better-slop.vercel.app/stars" }
 		},
 		"condition": {
 			"regexFilter": "^https://github\\.com/stars/?(?:\\?.*)?$",
@@ -310,7 +312,7 @@
 		"action": {
 			"type": "redirect",
 			"redirect": {
-				"regexSubstitution": "https://better-hub.com/stars/\\1"
+				"regexSubstitution": "https://better-slop.vercel.app/stars/\\1"
 			}
 		},
 		"condition": {

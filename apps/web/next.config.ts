@@ -54,7 +54,7 @@ const nextConfig: NextConfig = {
 			{ protocol: "https", hostname: "raw.githubusercontent.com" },
 			{ protocol: "https", hostname: "user-images.githubusercontent.com" },
 			{ protocol: "https", hostname: "repository-images.githubusercontent.com" },
-			{ protocol: "https", hostname: "better-hub.com" },
+			{ protocol: "https", hostname: "better-slop.vercel.app" },
 			{ protocol: "https", hostname: "images.better-auth.com" },
 		],
 	},
@@ -105,7 +105,7 @@ export default withSentryConfig(nextConfig, {
 	// For all available options, see:
 	// https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
-	org: "better-hub",
+	org: "better-slop",
 
 	project: "javascript-nextjs",
 

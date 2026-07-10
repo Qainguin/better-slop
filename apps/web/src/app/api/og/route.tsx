@@ -19,7 +19,6 @@ function formatNum(n: number): string {
 	if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
 	return String(n);
 }
-
 // ── Repo OG ──
 
 async function repoImage(owner: string, repo: string, fonts: Awaited<ReturnType<typeof ogFonts>>) {
@@ -425,7 +424,7 @@ export async function GET(request: NextRequest) {
 						letterSpacing: "0.02em",
 					}}
 				>
-					BETTER-HUB.
+					BETTER-SLOP.
 				</div>
 			</div>
 		</OGFrame>,

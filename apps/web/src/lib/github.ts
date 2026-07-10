@@ -41,7 +41,6 @@ export function extractRepoPermissions(repoData: {
 		triage: !!p?.triage,
 	};
 }
-
 type RepoSort = "updated" | "pushed" | "full_name";
 type OrgRepoSort = "created" | "updated" | "pushed" | "full_name";
 type OrgRepoType = "all" | "public" | "private" | "forks" | "sources" | "member";
@@ -678,7 +677,7 @@ async function fetchUserEventsPublicUnauthenticated(username: string, perPage: n
 		{
 			headers: {
 				Accept: "application/vnd.github+json",
-				"User-Agent": "better-hub",
+				"User-Agent": "better-slop",
 			},
 		},
 	);

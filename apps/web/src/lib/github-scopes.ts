@@ -7,7 +7,6 @@ export interface ScopeGroup {
 	required?: boolean;
 	defaultOn?: boolean;
 }
-
 export const SCOPE_GROUPS: ScopeGroup[] = [
 	{
 		id: "profile",
@@ -26,7 +25,7 @@ export const SCOPE_GROUPS: ScopeGroup[] = [
 			"public_repo",
 			"repo:status",
 			"repo_deployment",
-			// https://github.com/better-auth/better-hub/issues/49
+			// https://github.com/better-auth/better-slop/issues/49
 			"read:org",
 		],
 		required: true,

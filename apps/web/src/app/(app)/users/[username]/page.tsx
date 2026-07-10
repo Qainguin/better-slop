@@ -42,7 +42,6 @@ function UnknownUserPage({ username }: { username: string }) {
 		</div>
 	);
 }
-
 export async function generateMetadata({
 	params,
 }: {
@@ -58,7 +57,7 @@ export async function generateMetadata({
 	const displayName = userData.name ? `${userData.name} (${userData.login})` : userData.login;
 	return {
 		title: displayName,
-		description: userData.bio || `${displayName} on Better Hub`,
+		description: userData.bio || `${displayName} on Better Slop`,
 		openGraph: { title: displayName, ...ogImages(ogUrl) },
 		twitter: { card: "summary_large_image", ...ogImages(ogUrl) },
 	};

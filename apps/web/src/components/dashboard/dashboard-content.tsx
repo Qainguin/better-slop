@@ -65,7 +65,6 @@ interface DashboardContentProps {
 	activity: Array<ActivityEvent>;
 	trending: Array<TrendingRepoItem>;
 }
-
 function extractRepoName(repoUrl: string) {
 	const parts = repoUrl.split("/");
 	return `${parts[parts.length - 2]}/${parts[parts.length - 1]}`;
@@ -244,7 +243,7 @@ function ExtensionBanner() {
 				>
 					browser extension
 				</a>{" "}
-				to automatically redirect GitHub links to Better Hub.
+				to automatically redirect GitHub links to Better Slop.
 			</p>
 			<button
 				onClick={() => {

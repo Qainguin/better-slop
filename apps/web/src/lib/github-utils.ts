@@ -49,7 +49,6 @@ export function getLanguageColor(language: string | null | undefined): string {
 	if (!language) return DEFAULT_LANG_COLOR;
 	return LANGUAGE_COLORS[language] ?? DEFAULT_LANG_COLOR;
 }
-
 /**
  * Deduplicates an array of user-like objects into unique participants by login.
  */
@@ -329,7 +328,7 @@ export function parseGitHubUrl(htmlUrl: string): ParsedGitHubUrl | null {
 					return { owner, repo, type: "action_run", runId };
 				}
 			}
-			// /actions/:runId/job/:jobId (better-hub style)
+			// /actions/:runId/job/:jobId (better-slop style)
 			if (rest[1]) {
 				const runId = parsePositiveInt(rest[1]);
 				if (runId !== null) {

@@ -1,5 +1,5 @@
 {
-	"name": "@better-hub/monorepo",
+	"name": "@better-slop/monorepo",
 	"private": true,
 	"description": "A better place to collaborate on code — for humans and agents",
 	"keywords": [
@@ -10,14 +10,14 @@
 		"github",
 		"pull-requests"
 	],
-	"homepage": "https://better-hub.com",
+	"homepage": "https://better-slop.vercel.app",
 	"bugs": {
-		"url": "https://github.com/better-auth/better-hub/issues"
+		"url": "https://github.com/better-auth/better-slop/issues"
 	},
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/better-auth/better-hub.git"
+		"url": "https://github.com/better-auth/better-slop.git"
 	},
 	"workspaces": [
 		"apps/*",
