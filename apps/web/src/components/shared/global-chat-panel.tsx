@@ -185,6 +185,10 @@ export function GlobalChatPanel() {
 	// and causes hydration mismatches.
 	const [mounted, setMounted] = useState(false);
 	useEffect(() => setMounted(true), []);
+	useEffect(() => {
+		if (!mounted || !state.isOpen) return;
+		document.querySelector<HTMLTextAreaElement>("[data-ghost-input]")?.focus();
+	}, [mounted, state.isOpen]);
 
 	// ── Ghost conversation history ──────────────────────────────────────
 	const [ghostHistory, setGhostHistory] = useState<

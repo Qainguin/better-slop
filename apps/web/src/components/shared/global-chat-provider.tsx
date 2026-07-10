@@ -153,6 +153,7 @@ export function GlobalChatProvider({ children, initialTabState }: GlobalChatProv
 	const [tabState, setTabState] = useState<GhostTabState>(initialTabState);
 
 	const contextHandlerRef = useRef<AddCodeContextFn | null>(null);
+	const pendingContextsRef = useRef<InlineContext[]>([]);
 	// Track open state for synchronous keyboard shortcut checks
 	const isOpenRef = useRef(false);
 	// Track the pathname when the panel was last closed, so we can detect repo/page changes on reopen
@@ -375,9 +376,11 @@ export function GlobalChatProvider({ children, initialTabState }: GlobalChatProv
 	const addCodeContext = useCallback(
 		(context: InlineContext) => {
 			setState((prev) => ({ ...prev, isOpen: true }));
-			setTimeout(() => {
-				contextHandlerRef.current?.(context);
-			}, 50);
+			if (contextHandlerRef.current) {
+				contextHandlerRef.current(context);
+			} else {
+				pendingContextsRef.current.push(context);
+			}
 			focusGhostInput();
 		},
 		[focusGhostInput],
@@ -385,6 +388,8 @@ export function GlobalChatProvider({ children, initialTabState }: GlobalChatProv
 
 	const registerContextHandler = useCallback((fn: AddCodeContextFn) => {
 		contextHandlerRef.current = fn;
+		for (const context of pendingContextsRef.current) fn(context);
+		pendingContextsRef.current = [];
 	}, []);
 
 	const ghostHistoryRefetchRef = useRef<(() => void) | null>(null);

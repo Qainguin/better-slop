@@ -1,8 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
 	LogOut,
 	ExternalLink,
@@ -16,10 +13,12 @@ import {
 	Store,
 } from "lucide-react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 const CommandMenu = dynamic(() => import("@/components/command-menu").then((m) => m.CommandMenu));
 import { useColorTheme } from "@/components/theme/theme-provider";
-import { signOut } from "@/lib/auth-client";
 import {
 	DropdownMenu,
 	DropdownMenuTrigger,
@@ -30,16 +29,21 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { SettingsDialog } from "@/components/settings/settings-dialog";
+import { signOut } from "@/lib/auth-client";
+const SettingsDialog = dynamic(() =>
+	import("@/components/settings/settings-dialog").then((module) => module.SettingsDialog),
+);
 import type { TabId } from "@/components/settings/settings-content";
 import { NavbarGhostButton } from "@/components/shared/floating-ghost-button";
 import { useMutationEvents } from "@/components/shared/mutation-event-provider";
 import { useNavVisibility } from "@/components/shared/nav-visibility-provider";
 import { cn } from "@/lib/utils";
-import { NotificationSheet } from "@/components/layout/notification-sheet";
+const NotificationSheet = dynamic(() =>
+	import("@/components/layout/notification-sheet").then((module) => module.NotificationSheet),
+);
+import { APP_ROUTES } from "@/app-routes";
 import { $Session } from "@/lib/auth";
 import type { NotificationItem } from "@/lib/github-types";
-import { APP_ROUTES } from "@/app-routes";
 
 interface AppNavbarProps {
 	session: $Session;
@@ -379,40 +383,44 @@ export function AppNavbar({ session, notifications }: AppNavbarProps) {
 				</div>
 			</nav>
 
-			<NotificationSheet
-				open={notifOpen}
-				onOpenChange={setNotifOpen}
-				notifications={notifications}
-				doneIds={doneIds}
-				setDoneIds={setDoneIds}
-			/>
+			{notifOpen && (
+				<NotificationSheet
+					open
+					onOpenChange={setNotifOpen}
+					notifications={notifications}
+					doneIds={doneIds}
+					setDoneIds={setDoneIds}
+				/>
+			)}
 
-			<SettingsDialog
-				open={settingsOpen}
-				onOpenChange={(open) => {
-					setSettingsOpen(open);
-					if (!open) setSettingsTab(undefined);
-				}}
-				initialTab={settingsTab}
-				user={{
-					name: session.user.name || "",
-					email: session.user.email,
-					image: session.user.image ?? null,
-				}}
-				githubProfile={{
-					login: gh.login,
-					avatar_url: gh.avatar_url,
-					bio: gh.bio ?? null,
-					company: gh.company ?? null,
-					location: gh.location ?? null,
-					blog: gh.blog ?? null,
-					twitter_username: gh.twitter_username ?? null,
-					public_repos: gh.public_repos ?? 0,
-					followers: gh.followers ?? 0,
-					following: gh.following ?? 0,
-					created_at: gh.created_at ?? "",
-				}}
-			/>
+			{settingsOpen && (
+				<SettingsDialog
+					open
+					onOpenChange={(open) => {
+						setSettingsOpen(open);
+						if (!open) setSettingsTab(undefined);
+					}}
+					initialTab={settingsTab}
+					user={{
+						name: session.user.name || "",
+						email: session.user.email,
+						image: session.user.image ?? null,
+					}}
+					githubProfile={{
+						login: gh.login,
+						avatar_url: gh.avatar_url,
+						bio: gh.bio ?? null,
+						company: gh.company ?? null,
+						location: gh.location ?? null,
+						blog: gh.blog ?? null,
+						twitter_username: gh.twitter_username ?? null,
+						public_repos: gh.public_repos ?? 0,
+						followers: gh.followers ?? 0,
+						following: gh.following ?? 0,
+						created_at: gh.created_at ?? "",
+					}}
+				/>
+			)}
 		</header>
 	);
 }

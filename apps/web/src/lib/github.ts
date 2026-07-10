@@ -1,7 +1,9 @@
 import { Octokit } from "@octokit/rest";
 import { headers } from "next/headers";
 import { cache } from "react";
+
 import { $Session, getServerSession } from "./auth";
+import { computeContributorScore } from "./contributor-score";
 import {
 	claimDueGithubSyncJobs,
 	deleteGithubCacheByPrefix,
@@ -17,7 +19,6 @@ import {
 	upsertSharedCacheEntry,
 } from "./github-sync-store";
 import { redis } from "./redis";
-import { computeContributorScore } from "./contributor-score";
 import { getCachedAuthorDossier, setCachedAuthorDossier } from "./repo-data-cache";
 
 export type RepoPermissions = {
@@ -2596,7 +2597,7 @@ export async function getOrg(org: string) {
 	});
 }
 
-export async function getNotifications(perPage = 20) {
+export const getNotifications = cache(async (perPage = 20) => {
 	const authCtx = await getGitHubAuthContext();
 	return readLocalFirstGitData({
 		authCtx,
@@ -2607,7 +2608,7 @@ export async function getNotifications(perPage = 20) {
 		jobPayload: { perPage },
 		fetchRemote: (octokit) => fetchNotificationsFromGitHub(octokit, perPage),
 	});
-}
+});
 
 export async function searchIssues(query: string, perPage = 20) {
 	const authCtx = await getGitHubAuthContext();

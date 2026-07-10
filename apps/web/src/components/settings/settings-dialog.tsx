@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback, useRef, useState } from "react";
+
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import type { UserSettings } from "@/lib/user-settings-store";
+
 import { SettingsContent } from "./settings-content";
 import type { TabId } from "./settings-content";
-import type { UserSettings } from "@/lib/user-settings-store";
 
 export interface GitHubProfile {
 	login: string;
@@ -22,7 +24,7 @@ export interface GitHubProfile {
 	created_at: string;
 }
 
-interface SettingsDialogProps {
+export interface SettingsDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	initialTab?: TabId;
